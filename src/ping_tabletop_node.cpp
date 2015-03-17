@@ -101,7 +101,14 @@ int main(int argc, char **argv)
   recognition_srv.request.table = segmentation_srv.response.table;
   recognition_srv.request.clusters = segmentation_srv.response.clusters;
   recognition_srv.request.num_models = 5;
-  
+
+  /*
+  ros::NodeHandle priv_nh_;
+  bool perform_fit_merge_;
+  priv_nh_.param<bool>("perform_fit_merge", perform_fit_merge_, true);
+  recognition_srv.request.perform_fit_merge = perform_fit_merge_;
+  */
+
   if (!ros::service::call(service_name, recognition_srv))
   {
     ROS_ERROR("Call to recognition service failed");
@@ -117,7 +124,7 @@ int main(int argc, char **argv)
     }
     else
     {
-      ROS_INFO("  Model id %d",recognition_srv.response.models[i].model_list[0].model_id);
+      ROS_INFO("  Model id %d",recognition_srv.response.models[i].model_list[i].model_id);
     }
   }
 

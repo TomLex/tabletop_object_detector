@@ -15,12 +15,15 @@
 
 	<!-- object recognition -->
 	<include file="$(find tabletop_object_detector)/launch/tabletop_object_recognition.launch">
-      <arg name="model_set" value="$(arg model_set)" />
+    	<arg name="model_set" value="$(arg model_set)" />
     </include>
 
 	<!--complete node -->
-	<node pkg="tabletop_object_detector" name="tabletop_complete_node" type="tabletop_complete_node"
+	<!--
+    <node pkg="tabletop_object_detector" name="tabletop_complete_node" type="tabletop_complete_node"
 	respawn="true" output="screen">
 	  <param name="perform_fit_merge" value="true" />
 	</node>
+	-->
+	
 </launch>

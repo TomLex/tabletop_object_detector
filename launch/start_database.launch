@@ -2,10 +2,10 @@
 
   <!-- load database connection parameters -->
   <rosparam command="load" 
-            file="$(find tabletop_object_detector)/config/my_server.yaml"/>
+            file="$(find household_objects_database)/config/localhost.yaml"/>
 
   <!-- start the database wrapper node -->
-  <node pkg="tabletop_object_detector" name="objects_database_node" 
+  <node pkg="household_objects_database" name="objects_database_node" 
         type="objects_database_node" respawn="true" output="screen"/>
 
 </launch>
