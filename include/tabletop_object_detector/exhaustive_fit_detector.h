@@ -196,6 +196,7 @@ void ExhaustiveFitDetector<Fitter>::loadDatabaseModels(std::string model_set)
   }
 
   ROS_INFO("Object detector: loading object models");
+  ROS_INFO("MODELS NUMBER: %d", model_list.response.model_ids.size());
   for(size_t i=0; i<model_list.response.model_ids.size(); i++) 
   {
     int model_id = model_list.response.model_ids[i];

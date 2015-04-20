@@ -57,6 +57,8 @@
 #include "tabletop_object_detector/AddModelExclusion.h"
 #include "tabletop_object_detector/NegateExclusions.h"
 
+#include <typeinfo>
+
 namespace tabletop_object_detector {
 
 class TabletopObjectRecognizer 
@@ -236,6 +238,7 @@ bool TabletopObjectRecognizer::serviceCallback(TabletopObjectRecognition::Reques
   objectDetection<sensor_msgs::PointCloud>(request.clusters, request.num_models, request.table, request.perform_fit_merge, response);
 
   publishFitMarkers(response.models, request.table);
+  sleep(20);
   clearOldMarkers(request.table.pose.header.frame_id);
 
   return true;
@@ -259,7 +262,7 @@ void TabletopObjectRecognizer::objectDetection(std::vector<PointCloudType> &clus
     raw_fit_results.push_back( detector_.fitBestModels<PointCloudType>(clusters[i], std::max(1,num_models)) );
     response.cluster_model_indices[i] = i;
   }
-  ROS_DEBUG("Raw fit results computed");
+  ROS_INFO("Raw fit results computed");
 
   //merge models that were fit very close to each other
   if (perform_fit_merge)
@@ -270,44 +273,44 @@ void TabletopObjectRecognizer::objectDetection(std::vector<PointCloudType> &clus
       //if cluster i has already been merged continue
       if (response.cluster_model_indices[i] != (int)i || raw_fit_results.at(i).empty()) 
       {
-	i++;
-	continue;
+      	i++;
+      	continue;
       }
 
       size_t j;
       for (j=i+1; j<clusters.size(); j++)
       {
-	//if cluster j has already been merged continue
-	if (response.cluster_model_indices[j] != (int)j) continue;
-	//if there are no fits, merge based on cluster vs. fit
-	if (raw_fit_results.at(j).empty()) 
-	{
-	  if ( fitClusterDistance<PointCloudType>( raw_fit_results.at(i).at(0), 
-						   clusters.at(j) ) < fit_merge_threshold_ ) break;
-	  else continue;
-	}
-	//else merge based on fits
-	if ( fitDistance(raw_fit_results.at(i).at(0), raw_fit_results.at(j).at(0)) < fit_merge_threshold_) break;
+      	//if cluster j has already been merged continue
+      	if (response.cluster_model_indices[j] != (int)j) continue;
+      	//if there are no fits, merge based on cluster vs. fit
+      	if (raw_fit_results.at(j).empty()) 
+      	{
+      	  if ( fitClusterDistance<PointCloudType>( raw_fit_results.at(i).at(0), 
+      						   clusters.at(j) ) < fit_merge_threshold_ ) break;
+      	  else continue;
+      	}
+      	//else merge based on fits
+      	if ( fitDistance(raw_fit_results.at(i).at(0), raw_fit_results.at(j).at(0)) < fit_merge_threshold_) break;
       }
       if (j<clusters.size())
       {
-	ROS_DEBUG("Post-fit merging of clusters %u and %u", (unsigned int) i, (unsigned int) j);
-	//merge cluster j into i
-	clusters[i].points.insert( clusters[i].points.end(), clusters[j].points.begin(), clusters[j].points.end() );
-	//delete fits for cluster j so we ignore it from now on
-	raw_fit_results.at(j).clear();
-	//fits for cluster j now point at fit for cluster i
-	response.cluster_model_indices[j] = i;
-	//refit cluster i
-	raw_fit_results.at(i) = detector_.fitBestModels(clusters[i], std::max(1,num_models));
+      	ROS_INFO("Post-fit merging of clusters %u and %u", (unsigned int) i, (unsigned int) j);
+      	//merge cluster j into i
+      	clusters[i].points.insert( clusters[i].points.end(), clusters[j].points.begin(), clusters[j].points.end() );
+      	//delete fits for cluster j so we ignore it from now on
+      	raw_fit_results.at(j).clear();
+      	//fits for cluster j now point at fit for cluster i
+      	response.cluster_model_indices[j] = i;
+      	//refit cluster i
+      	raw_fit_results.at(i) = detector_.fitBestModels(clusters[i], std::max(1,num_models));
       }
       else
       {
-	i++;
+      	i++;
       }
     }
   }
-  ROS_DEBUG("Post-fit merge completed");
+  ROS_INFO("Post-fit merge completed");
 
   //make sure raw clusters point at the right index in fit_models
   for (size_t i=0; i<raw_fit_results.size(); i++)
@@ -317,16 +320,16 @@ void TabletopObjectRecognizer::objectDetection(std::vector<PointCloudType> &clus
       int ind = response.cluster_model_indices[i];
       ROS_ASSERT( ind < (int)i);
       response.cluster_model_indices[i] = response.cluster_model_indices[ind];
-      ROS_DEBUG("Fit for cluster %u has been merged with fit for cluster %u", (unsigned int) i, (unsigned int) ind);
+      ROS_INFO("Fit for cluster %u has been merged with fit for cluster %u", (unsigned int) i, (unsigned int) ind);
     }
   }
-  ROS_DEBUG("Clustered indices arranged");
+  ROS_INFO("Clustered indices arranged");
 
   tf::Transform table_trans;
   tf::poseMsgToTF(table.pose.pose, table_trans);
   for (size_t i=0; i<raw_fit_results.size(); i++)
   {
-    ROS_DEBUG("Cluster %u results:", (unsigned int) i);
+    ROS_INFO("Cluster %u results:", (unsigned int) i);
     household_objects_database_msgs::DatabaseModelPoseList model_potential_fit_list;
     //prepare the actual result for good fits, only these are returned
     for (size_t j=0; j < raw_fit_results[i].size(); j++)
@@ -345,7 +348,7 @@ void TabletopObjectRecognizer::objectDetection(std::vector<PointCloudType> &clus
       pose_msg.confidence = raw_fit_results[i][j].getScore();
       //and push it in the list for this cluster
       model_potential_fit_list.model_list.push_back(pose_msg);
-      ROS_DEBUG("  model %d with confidence %f", pose_msg.model_id, pose_msg.confidence);
+      ROS_INFO("  model %d with confidence %f", pose_msg.model_id, pose_msg.confidence);
     }
     response.models.push_back(model_potential_fit_list);
   }
@@ -360,9 +363,11 @@ void TabletopObjectRecognizer::publishFitMarkers(
   for (size_t i=0; i<potential_models.size(); i++)
   {
     const std::vector<household_objects_database_msgs::DatabaseModelPose> models = potential_models[i].model_list;
+    ROS_INFO("POTENTIAL_MODEL_ID:%zu MODELS_SIZE:%d", i, models.size());
     for (size_t j=0; j<models.size(); j++)
     {
-      if (models[j].confidence > min_marker_quality_) break;
+      ROS_INFO("MODEL_ID:%d WITH_CONFIDENCE:%lf", models[j].model_id, models[j].confidence);
+      //if (models[j].confidence > min_marker_quality_) break;
       household_objects_database_msgs::GetModelMesh get_mesh;
       get_mesh.request.model_id = models[j].model_id;
       if ( !get_model_mesh_srv_.call(get_mesh) ||
@@ -381,6 +386,7 @@ void TabletopObjectRecognizer::publishFitMarkers(
         marker_pub_.publish(fitMarker);
       }  
     }
+    ROS_INFO("_____________");
   }
 }
 

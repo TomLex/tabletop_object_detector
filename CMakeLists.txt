@@ -156,11 +156,6 @@ target_link_libraries(tabletop_complete_node
   ${catkin_LIBRARIES}
 )
 
-add_executable(ping_complete src/ping_complete.cpp)
-target_link_libraries(ping_complete
-  ${catkin_LIBRARIES}
-)
-
 
 ##rosbuild_add_boost_directories()
 ##rosbuild_link_boost(tabletop_object_recognition system)

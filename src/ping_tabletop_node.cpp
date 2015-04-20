@@ -69,26 +69,6 @@ int main(int argc, char **argv)
   ROS_INFO("Segmentation service succeeded. Detected %d clusters", (int)segmentation_srv.response.clusters.size());
   if (segmentation_srv.response.clusters.empty()) exit(0);
 
-  //also test segmenting with input table
-  sleep(0.5);
-  segmentation_srv.request.table = segmentation_srv.response.table;
-  ROS_INFO("Re-segmenting with the same table shifted 10 cm closer to the robot");
-  for(size_t i=0; i<segmentation_srv.request.table.convex_hull.vertices.size(); i++)
-  {
-    segmentation_srv.request.table.convex_hull.vertices[i].x -= .10;
-  }
-  if (!ros::service::call(service_name, segmentation_srv))
-  {
-    ROS_ERROR("Call to segmentation service failed");
-    exit(0);
-  }
-  if (segmentation_srv.response.result != segmentation_srv.response.SUCCESS)
-  {
-    ROS_ERROR("Segmentation service returned error %d", segmentation_srv.response.result);
-    exit(0);
-  }
-  ROS_INFO("Segmentation service with table input succeeded. Detected %d clusters", (int)segmentation_srv.response.clusters.size());
-
   service_name = "/tabletop_object_recognition";
   if ( !ros::service::waitForService(service_name, ros::Duration().fromSec(3.0)) )
   {
@@ -96,18 +76,15 @@ int main(int argc, char **argv)
     exit(0);
   }
 
-  
   tabletop_object_detector::TabletopObjectRecognition recognition_srv;
   recognition_srv.request.table = segmentation_srv.response.table;
   recognition_srv.request.clusters = segmentation_srv.response.clusters;
   recognition_srv.request.num_models = 5;
 
-  /*
   ros::NodeHandle priv_nh_;
   bool perform_fit_merge_;
   priv_nh_.param<bool>("perform_fit_merge", perform_fit_merge_, true);
   recognition_srv.request.perform_fit_merge = perform_fit_merge_;
-  */
 
   if (!ros::service::call(service_name, recognition_srv))
   {

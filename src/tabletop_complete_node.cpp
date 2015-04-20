@@ -68,6 +68,7 @@ TabletopCompleteNode::TabletopCompleteNode() : nh_(""), priv_nh_("~")
 {
   std::string service_name;
 
+  ROS_INFO("IN COMPLETE NODE CONSTRUCTOR 1");
   priv_nh_.param<std::string>("segmentation_srv", service_name, "/tabletop_segmentation");
   while ( !ros::service::waitForService(service_name, ros::Duration(2.0)) && nh_.ok() ) 
   {
@@ -75,14 +76,16 @@ TabletopCompleteNode::TabletopCompleteNode() : nh_(""), priv_nh_("~")
   }
   if (!nh_.ok()) exit(0);
   seg_srv_ = nh_.serviceClient<TabletopSegmentation>(service_name, true);
-
-  priv_nh_.param<std::string>("recognition_srv", service_name, "/tabletop_object_recognition");
+  ROS_INFO("IN COMPLETE NODE CONSTRUCTOR 2");
+  priv_nh_.param<std::string>("object_recognition_srv", service_name, "/tabletop_object_recognition");
+  ROS_INFO("WAITING FOR: %s", service_name.c_str());
   while ( !ros::service::waitForService(service_name, ros::Duration(2.0)) && nh_.ok() ) 
   {
     ROS_INFO("Waiting for %s service to come up", service_name.c_str());
   }
   if (!nh_.ok()) exit(0);
   rec_srv_ = nh_.serviceClient<TabletopObjectRecognition>(service_name, true);
+  ROS_INFO("IN COMPLETE NODE CONSTRUCTOR 3");
   
   complete_srv_ = nh_.advertiseService("object_detection", &TabletopCompleteNode::serviceCallback, this);
   ROS_INFO("Tabletop complete node ready");
@@ -92,6 +95,7 @@ TabletopCompleteNode::TabletopCompleteNode() : nh_(""), priv_nh_("~")
 
 bool TabletopCompleteNode::serviceCallback(TabletopDetection::Request &request, TabletopDetection::Response &response)
 {
+  ROS_INFO("IN COMPLETE NODE");
   tabletop_object_detector::TabletopSegmentation segmentation_srv;
   if (!seg_srv_.call(segmentation_srv))
   {

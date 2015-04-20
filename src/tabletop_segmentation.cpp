@@ -215,19 +215,24 @@ bool TabletopSegmentor::serviceCallback(TabletopSegmentation::Request &request,
   ROS_INFO_STREAM("Point cloud received after " << ros::Time::now() - start_time << " seconds; processing");
   if (!processing_frame_.empty())
   {
+    ROS_INFO_STREAM("Frame not empty");
     //convert cloud to processing_frame_ (usually base_link)
     sensor_msgs::PointCloud old_cloud;  
     sensor_msgs::convertPointCloud2ToPointCloud (*recent_cloud, old_cloud);
     int current_try=0, max_tries = 3;
     while (1)
     {
+      ROS_INFO_STREAM("transforming...");
       bool transform_success = true;
       try
       {
-        listener_.transformPointCloud(processing_frame_, old_cloud, old_cloud);    
+        ROS_INFO_STREAM("transform process");
+        listener_.transformPointCloud(processing_frame_, old_cloud, old_cloud);
+        ROS_INFO_STREAM("process finished");    
       }
       catch (tf::TransformException ex)
       {
+        ROS_INFO_STREAM("some exception");
         transform_success = false;
         if (++current_try >= max_tries)
         {
@@ -238,7 +243,10 @@ bool TabletopSegmentor::serviceCallback(TabletopSegmentation::Request &request,
         }
         ROS_DEBUG("Failed to transform point cloud, attempt %d out of %d, exception: %s", current_try, max_tries, ex.what());
         //sleep a bit to give the listener a chance to get a new transform
+        ROS_INFO_STREAM("going to sleep");
         ros::Duration(0.1).sleep();
+        //sleep(0.1);
+        ROS_INFO_STREAM("sleeped");
       }
       if (transform_success) break;
     }
@@ -251,6 +259,7 @@ bool TabletopSegmentor::serviceCallback(TabletopSegmentation::Request &request,
   }
   else
   {
+    ROS_INFO_STREAM("Frame is empty");
     processCloud(*recent_cloud, response, request.table);
     clearOldMarkers(recent_cloud->header.frame_id);
   }
@@ -902,6 +911,21 @@ void TabletopSegmentor::processCloud(const sensor_msgs::PointCloud2 &cloud,
   ROS_INFO("Clusters converted");
   response.clusters = clusters;  
 
+  
+  ros::Publisher cluster_pub;
+  ros::NodeHandle nh;
+  cluster_pub = nh.advertise<sensor_msgs::PointCloud> ("output1", 100);
+  cluster_pub.publish(clusters[0]);
+  cluster_pub.publish(clusters[1]);
+  cluster_pub.publish(clusters[2]);
+  cluster_pub.publish(clusters[3]);
+  cluster_pub.publish(clusters[4]);
+  cluster_pub.publish(clusters[5]);
+  cluster_pub.publish(clusters[6]);
+  if(clusters.size() == 8)
+    cluster_pub.publish(clusters[7]);
+  //sleep(20);
+  
   publishClusterMarkers(clusters, cloud.header);
 }
 
