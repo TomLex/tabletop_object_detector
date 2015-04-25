@@ -1,6 +1,6 @@
 <launch>
     <arg name="flatten_table" default="false"/>	
-    <!-- arg name="model_set" default="REDUCED_MODEL_SET"/> -->
+    <!-- <arg name="model_set" default="REDUCED_MODEL_SET"/> -->
     <!-- arg name="model_set" default="COMPLEX_MODEL_SET"/> -->
     <arg name="model_set" default="DIPLOMA_SET"/>
 

@@ -15,7 +15,7 @@
 	<param name="clustering_voxel_size" value="$(arg tabletop_segmentation_clustering_voxel_size)" />
 	<param name="inlier_threshold" value="300" />
 	<param name="plane_detection_voxel_size" value="0.01" />
-	<param name="cluster_distance" value="0.03" />
+	<param name="cluster_distance" value="0.03815" />
 	<param name="min_cluster_size" value="300" />
 	<param name="flatten_table" value="$(arg flatten_table)" />
 	<param name="table_padding" value="$(arg table_padding)" />
@@ -37,13 +37,13 @@
 	<!-- assumed to the the camera's optical frame -->
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="processing_frame" value="" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="up_direction" value="-1.0" />
-	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="z_filter_min" value="0.4" />
+	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="z_filter_min" value="0.01" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="z_filter_max" value="1.25" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="y_filter_min" value="-1.2" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="y_filter_max" value="1.2" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="x_filter_min" value="-1.2" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="x_filter_max" value="1.2" />
-	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="table_z_filter_min" value="0.01" />
+	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="table_z_filter_min" value="0.008" />
 	<param unless="$(arg tabletop_segmentation_convert_to_base_link)" name="table_z_filter_max" value="0.5" />			
 
     </node>
