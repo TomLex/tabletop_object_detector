@@ -238,7 +238,6 @@ bool TabletopObjectRecognizer::serviceCallback(TabletopObjectRecognition::Reques
   objectDetection<sensor_msgs::PointCloud>(request.clusters, request.num_models, request.table, request.perform_fit_merge, response);
 
   publishFitMarkers(response.models, request.table);
-  sleep(20);
   clearOldMarkers(request.table.pose.header.frame_id);
 
   return true;

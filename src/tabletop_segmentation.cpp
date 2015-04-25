@@ -911,21 +911,6 @@ void TabletopSegmentor::processCloud(const sensor_msgs::PointCloud2 &cloud,
   ROS_INFO("Clusters converted");
   response.clusters = clusters;  
 
-  
-  ros::Publisher cluster_pub;
-  ros::NodeHandle nh;
-  cluster_pub = nh.advertise<sensor_msgs::PointCloud> ("output1", 100);
-  cluster_pub.publish(clusters[0]);
-  cluster_pub.publish(clusters[1]);
-  cluster_pub.publish(clusters[2]);
-  cluster_pub.publish(clusters[3]);
-  cluster_pub.publish(clusters[4]);
-  cluster_pub.publish(clusters[5]);
-  cluster_pub.publish(clusters[6]);
-  if(clusters.size() == 8)
-    cluster_pub.publish(clusters[7]);
-  //sleep(20);
-  
   publishClusterMarkers(clusters, cloud.header);
 }
 
