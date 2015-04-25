@@ -191,14 +191,14 @@ void ModelToCloudFitter::sampleMesh(const shape_msgs::Mesh &mesh,
   for (size_t i=0; i<mesh.triangles.size(); i++)
   {
     tf::Vector3 v0( mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(0) ).x,
-		    mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(0) ).y,
-		    mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(0) ).z);
+                   mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(0) ).y,
+                   mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(0) ).z);
     tf::Vector3 v1( mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(1) ).x,
-		    mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(1) ).y,
-		    mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(1) ).z);
+                   mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(1) ).y,
+                   mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(1) ).z);
     tf::Vector3 v2( mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(2) ).x,
-		    mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(2) ).y,
-		    mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(2) ).z);
+                   mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(2) ).y,
+                   mesh.vertices.at( mesh.triangles.at(i).vertex_indices.at(2) ).z);
     std::vector<tf::Vector3> triangleVectors = interpolateTriangle(v0, v1, v2, resolution);
     btVectors.insert(btVectors.begin(), triangleVectors.begin(), triangleVectors.end());
   }
@@ -210,7 +210,7 @@ void DistanceFieldFitter::initializeFromMesh(const shape_msgs::Mesh &mesh)
   std::vector<tf::Vector3> btVectors;
   //we use a slightly larger resolution than the distance field, in an attempt to bring
   //down pre-computation time
-  sampleMesh(mesh, btVectors,  1.5 * distance_field_resolution_ ); 
+  sampleMesh(mesh, btVectors,  1.5 * distance_field_resolution_ );
   initializeFromBtVectors(btVectors);
 }
 
